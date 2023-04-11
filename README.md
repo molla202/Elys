@@ -1,5 +1,6 @@
 ## ÖDÜLSÜZDÜR
 ## gereksinimler 4cpu 8ram
+## exp. ( https://explorer.stavr.tech/elys-testnet  )
 # Elys
 ![1500x500](https://user-images.githubusercontent.com/91562185/231207195-fff4a84b-36d3-4af5-85dd-1b9675417730.jpg)
 
