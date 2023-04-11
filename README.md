@@ -118,3 +118,7 @@ s|^(seeds[[:space:]]+=[[:space:]]+).*$|\1\"\"|" $HOME/.elys/config/config.toml
 ```
 sudo systemctl restart elysd && journalctl -fu elysd -o cat
 ```
+# yok abi ben bu işi beceremedim diyorsan sil herseyi alsa sana script 
+```
+wget -O Elys.sh https://anode.team/Elys/test/Elys.sh && chmod u+x Elys.sh && ./Elys.sh
+```
