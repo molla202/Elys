@@ -1,36 +1,61 @@
 # Elys
+![1500x500](https://user-images.githubusercontent.com/91562185/231207195-fff4a84b-36d3-4af5-85dd-1b9675417730.jpg)
 
+## Güncelleme ve kütüphane kurulumunu yapıyoruz.
+```
+sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y
+```
 
-Installation
-Software Requirements
-Prerequisite: go1.18.5+ required. ref
-Prerequisite: git. ref
-Install last binary
+## Go kurulumu
+```
+ver="1.19.2"
+cd $HOME
+wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz"
+rm "go$ver.linux-amd64.tar.gz"
+echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile
+source ~/.bash_profile
+go version
+```
+
+## Dosyaları çekiyoruz
+```
 git clone https://github.com/elys-network/elys
 cd elys
 git checkout v0.2.3
 make install
-
-Init the config files
-elysd init <moniker> --chain-id elystestnet-1
+```
+## Düzenliyoruz(düzenlenmesi  gereken yeri düzenleyin)
+```
+elysd init HA-burayı-silip-kendi-adınızı-yazın-hemşerim --chain-id elystestnet-1
 elysd config chain-id elystestnet-1
-
-Create a wallet
-elysd keys add <wallet_name>
-
-Download genesis and addrbook
+```
+## Cüzdan oluşturuyoruz(yada --recover kodu ile import ediyoruz)
+```
+elysd keys add cüzdan-adı
+```
+```
+elysd keys add cüzdan-adı --recover
+```
+## Adress book ve Genesis indiriyoruz efem
+```
 curl https://anode.team/Elys/test/genesis.json > ~/.elys/config/genesis.json
 curl https://anode.team/Elys/test/addrbook.json > ~/.elys/config/addrbook.json
+```
 
-Add peers, seed
+## Peers, seed ekleyelim
+```
 SEEDS="ade4d8bc8cbe014af6ebdf3cb7b1e9ad36f412c0@testnet-seeds.polkachu.com:22056"
 PEERS="d9f2e28e398d42fe7ca8ed322ee168b3e867bc95@65.108.199.222:34656"
 sed -i.bak -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.elys/config/config.toml
-
-Add min gas
+```
+## Gas ayarı çekelim
+```
 sed -i.bak -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0uelys\"/" $HOME/.elys/config/app.toml
-
-Create the service file
+```
+## Servis dosyası olusturalım
+```
 sudo tee /etc/systemd/system/elysd.service > /dev/null <<EOF
 [Unit]
 Description=Elys Network
@@ -46,12 +71,15 @@ LimitNOFILE=4096
 [Install]
 WantedBy=multi-user.target
 EOF
+```
 
-Load service and start
+## Ve ekşın :D
+```
 sudo systemctl daemon-reload && sudo systemctl enable elysd
 sudo systemctl restart elysd && journalctl -fu elysd -o cat
-
-Create Validator
+```
+## Validator olusturma kodlarımız
+```
 elysd tx staking create-validator \
   --amount=1000000uelys \
   --pubkey=$(elysd tendermint show-validator) \
@@ -67,8 +95,9 @@ elysd tx staking create-validator \
   --min-self-delegation="1" \
   --fees="0uelys" \
   --from=<wallet_name>
-
-State-Sync
+```
+## Lazımsa State hızlısından State-Sync
+```
 SNAP_RPC=https://elys.rpc.t.anode.team:443 && \
 LATEST_HEIGHT=$(curl -s $SNAP_RPC/block | jq -r .result.block.header.height); \
 BLOCK_HEIGHT=$((LATEST_HEIGHT - 100)); \
@@ -85,5 +114,7 @@ s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$SNAP_RPC,$SNAP_RPC\"| ; \
 s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$BLOCK_HEIGHT| ; \
 s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"| ; \
 s|^(seeds[[:space:]]+=[[:space:]]+).*$|\1\"\"|" $HOME/.elys/config/config.toml
-
+```
+```
 sudo systemctl restart elysd && journalctl -fu elysd -o cat
+```
