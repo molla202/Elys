@@ -2,6 +2,7 @@
 ## gereksinimler 4cpu 8ram
 ## exp. ( https://explorer.stavr.tech/elys-testnet  )
 ## Discord https://discord.gg/HPz8J9eC
+### güncelleme geldi snapsız hata verir
 # Elys
 ![1500x500](https://user-images.githubusercontent.com/91562185/231207195-fff4a84b-36d3-4af5-85dd-1b9675417730.jpg)
 
@@ -9,120 +10,110 @@
 ```
 sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y
 ```
-
-## Go kurulumu
 ```
-ver="1.19.2"
-cd $HOME
-wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
+# install dependencies, if needed
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl git wget htop tmux build-essential jq 
+make lz4 gcc unzip -y
+```
+```
+# install go, if needed
+cd ~
+! [ -x "$(command -v go)" ] && {
+VER="1.19.3"
+wget "https://golang.org/dl/go$VER.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz"
-rm "go$ver.linux-amd64.tar.gz"
-echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile
-source ~/.bash_profile
-go version
+sudo tar -C /usr/local -xzf "go$VER.linux-amd64.tar.gz"
+rm "go$VER.linux-amd64.tar.gz"
+[ ! -f ~/.bash_profile ] && touch ~/.bash_profile
+echo "export PATH=$PATH:/usr/local/go/bin:/go/bin" >> ~/.bash_profile
+. ~/.bash_profile
+}
+[ ! -d ~/go/bin ] && mkdir -p ~/go/bin
 ```
 
-## Dosyaları çekiyoruz
+## Ayarlama yapılacak yerler var not defterine yapıstırıp yapın sona komple 
+
 ```
-git clone https://github.com/elys-network/elys
+# ayarlamaları yapalım cüzdan adınızı falan yazın validator adınızı yazın aynı zamanda port yazıyor hangisini istiyorsanız onu yazın suan 38
+echo "export WALLET="cüzdan-adınız"" >> $HOME/.bash_profile
+echo "export MONIKER="validator-adınız"" >> $HOME/.bash_profile
+echo "export ELYS_CHAIN_ID="elystestnet-1"" >> $HOME/.bash_profile
+echo "export ELYS_PORT="38"" >> $HOME/.bash_profile
+source $HOME/.bash_profile
+
+# binary indiriyoruz
+cd $HOME
+rm -rf elys
+git clone https://github.com/elys-network/elys.git
 cd elys
-git checkout v0.2.3
+git checkout v0.3.1
 make install
-```
-## Düzenliyoruz(düzenlenmesi  gereken yeri düzenleyin)
-```
-elysd init HA-burayı-silip-kendi-adınızı-yazın-hemşerim --chain-id elystestnet-1
-elysd config chain-id elystestnet-1
-```
-## Cüzdan oluşturuyoruz(yada --recover kodu ile import ediyoruz)
-```
-elysd keys add cüzdan-adı
-```
-```
-elysd keys add cüzdan-adı --recover
-```
-## Adress book ve Genesis indiriyoruz efem
-```
-curl https://anode.team/Elys/test/genesis.json > ~/.elys/config/genesis.json
-curl https://anode.team/Elys/test/addrbook.json > ~/.elys/config/addrbook.json
-```
 
-## Peers, seed ekleyelim
-```
-SEEDS="ade4d8bc8cbe014af6ebdf3cb7b1e9ad36f412c0@testnet-seeds.polkachu.com:22056"
-PEERS="d9f2e28e398d42fe7ca8ed322ee168b3e867bc95@65.108.199.222:34656"
-sed -i.bak -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.elys/config/config.toml
-```
-## Gas ayarı çekelim
-```
-sed -i.bak -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0uelys\"/" $HOME/.elys/config/app.toml
-```
-## Servis dosyası olusturalım
-```
+# ayarlamaları yapalım
+elysd config node tcp://localhost:${ELYS_PORT}657
+elysd config keyring-backend os
+elysd config chain-id elystestnet-1
+elysd init validator-adınız --chain-id elystestnet-1
+
+# genesis ve addrbook indiriyoruz
+wget -O $HOME/.elys/config/genesis.json https://testnet-files.itrocket.net/elys/genesis.json
+wget -O $HOME/.elys/config/addrbook.json https://testnet-files.itrocket.net/elys/addrbook.json
+
+# seeds ve peers indiriyoruz
+SEEDS="ae7191b2b922c6a59456588c3a262df518b0d130@elys-testnet-seed.itrocket.net:38656"
+PEERS="0977dd5475e303c99b66eaacab53c8cc28e49b05@elys-testnet-peer.itrocket.net:38656"
+sed -i -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.elys/config/config.toml
+
+# app.toml da port değiştiriyoruz çakışmasınlar :D
+sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${ELYS_PORT}317\"%;
+s%^address = \":8080\"%address = \":${ELYS_PORT}080\"%;
+s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${ELYS_PORT}090\"%; 
+s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${ELYS_PORT}091\"%; 
+s%^address = \"0.0.0.0:8545\"%address = \"0.0.0.0:${ELYS_PORT}545\"%; 
+s%^ws-address = \"0.0.0.0:8546\"%ws-address = \"0.0.0.0:${ELYS_PORT}546\"%" $HOME/.elys/config/app.toml
+
+# config.toml port ayarı
+sed -i.bak -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:${ELYS_PORT}658\"%; 
+s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://0.0.0.0:${ELYS_PORT}657\"%; 
+s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:${ELYS_PORT}060\"%;
+s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:${ELYS_PORT}656\"%;
+s%^external_address = \"\"%external_address = \"$(wget -qO- eth0.me):${ELYS_PORT}656\"%;
+s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":${ELYS_PORT}660\"%" $HOME/.elys/config/config.toml
+
+# pruning yapıyore
+sed -i -e "s/^pruning *=.*/pruning = \"nothing\"/" $HOME/.elys/config/app.toml
+sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"100\"/" $HOME/.elys/config/app.toml
+sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"50\"/" $HOME/.elys/config/app.toml
+
+# gas ayarı ve index ayarı
+sed -i 's/minimum-gas-prices =.*/minimum-gas-prices = "0.0uelys"/g' $HOME/.elys/config/app.toml
+sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.elys/config/config.toml
+sed -i -e "s/^indexer *=.*/indexer = \"null\"/" $HOME/.elys/config/config.toml
+
+# servis dosyası oluşturuyore
 sudo tee /etc/systemd/system/elysd.service > /dev/null <<EOF
 [Unit]
-Description=Elys Network
+Description=Elys node
 After=network-online.target
-
 [Service]
 User=$USER
-ExecStart=$(which elysd) start
-Restart=always
+ExecStart=$(which elysd) start --home $HOME/.elys
+Restart=on-failure
 RestartSec=3
-LimitNOFILE=4096
-
+LimitNOFILE=65535
 [Install]
 WantedBy=multi-user.target
 EOF
 ```
-
-## Ve ekşın :D
 ```
-sudo systemctl daemon-reload && sudo systemctl enable elysd
-sudo systemctl restart elysd && journalctl -fu elysd -o cat
-```
-## Validator olusturma kodlarımız
-```
-elysd tx staking create-validator \
-  --amount=1000000uelys \
-  --pubkey=$(elysd tendermint show-validator) \
-  --moniker="<moniker>" \
-  --identity="<identity>" \
-  --website="<website>" \
-  --details="<details>" \
-  --security-contact="<contact>" \
-  --chain-id="elystestnet-1" \
-  --commission-rate="0.10" \
-  --commission-max-rate="0.20" \
-  --commission-max-change-rate="0.01" \
-  --min-self-delegation="1" \
-  --fees="0uelys" \
-  --from=<wallet_name>
-```
-## Lazımsa State hızlısından State-Sync
-```
-SNAP_RPC=https://elys.rpc.t.anode.team:443 && \
-LATEST_HEIGHT=$(curl -s $SNAP_RPC/block | jq -r .result.block.header.height); \
-BLOCK_HEIGHT=$((LATEST_HEIGHT - 100)); \
-TRUST_HASH=$(curl -s "$SNAP_RPC/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash) && \
-echo $LATEST_HEIGHT $BLOCK_HEIGHT $TRUST_HASH
-
-wget https://anode.team/unsafe-reset-all.sh && chmod u+x unsafe-reset-all.sh && ./unsafe-reset-all.sh elysd .elys
-
-peers="d9f2e28e398d42fe7ca8ed322ee168b3e867bc95@65.108.199.222:34656"
-sed -i.bak -e  "s/^persistent_peers *=.*/persistent_peers = \"$peers\"/" $HOME/.elys/config/config.toml
-
-sed -i.bak -E "s|^(enable[[:space:]]+=[[:space:]]+).*$|\1true| ; \
-s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$SNAP_RPC,$SNAP_RPC\"| ; \
-s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$BLOCK_HEIGHT| ; \
-s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"| ; \
-s|^(seeds[[:space:]]+=[[:space:]]+).*$|\1\"\"|" $HOME/.elys/config/config.toml
+# snap çakalım hemen olsun
+elysd tendermint unsafe-reset-all --home $HOME/.elys
+curl https://testnet-files.itrocket.net/elys/snap_elys.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.elys
 ```
 ```
-sudo systemctl restart elysd && journalctl -fu elysd -o cat
-```
-# yok abi ben bu işi beceremedim diyorsan sil herseyi alsa sana script 
-```
-wget -O Elys.sh https://anode.team/Elys/test/Elys.sh && chmod u+x Elys.sh && ./Elys.sh
+# servisi başlatıp loglara bakıyoruz
+sudo systemctl daemon-reload
+sudo systemctl enable elysd
+sudo systemctl restart elysd && sudo journalctl -u elysd -f
 ```
