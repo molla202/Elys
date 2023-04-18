@@ -117,3 +117,37 @@ sudo systemctl daemon-reload
 sudo systemctl enable elysd
 sudo systemctl restart elysd && sudo journalctl -u elysd -f
 ```
+
+```
+# validator oluşturma
+elysd tx staking create-validator \
+  --amount 1000000uelys \
+  --from $WALLET \
+  --commission-max-change-rate "0.01" \
+  --commission-max-rate "0.2"   --commission-rate "0.05" \
+  --min-self-delegation "1" \
+  --pubkey  $(elysd tendermint show-validator) \
+  --moniker $MONIKER \
+  --chain-id elystestnet-1 \
+  --gas auto --gas-adjustment 1.5
+  ```
+# Cüzdan oluşturmak
+```
+elysd keys add $WALLET
+```
+# Cüzdan import
+```
+elysd keys add $WALLET --recover
+```
+# Silmek için
+```
+sudo systemctl stop elysd
+sudo systemctl disable elysd
+sudo rm -rf /etc/systemd/system/elysd.service
+sudo rm $(which elysd)
+sudo rm -rf $HOME/.elys
+sed -i "/ELYS_/d" $HOME/.bash_profile
+```
+
+
+
