@@ -12,26 +12,12 @@ sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang p
 ```
 ```
 # install dependencies, if needed
-sudo apt update && sudo apt upgrade -y
-sudo apt install curl git wget htop tmux build-essential jq 
-make lz4 gcc unzip -y
+sudo apt update
+
+sudo apt-get install git curl build-essential make jq gcc snapd chrony lz4 tmux unzip bc -y
 ```
-```
-# install go, if needed
-cd ~
-! [ -x "$(command -v go)" ] && {
-VER="1.19.3"
-wget "https://golang.org/dl/go$VER.linux-amd64.tar.gz"
-sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf "go$VER.linux-amd64.tar.gz"
-rm "go$VER.linux-amd64.tar.gz"
-[ ! -f ~/.bash_profile ] && touch ~/.bash_profile
-echo "export PATH=$PATH:/usr/local/go/bin:/go/bin" >> ~/.bash_profile
-. ~/.bash_profile
-}
-[ ! -d ~/go/bin ] && mkdir -p ~/go/bin
-```
-## GO olmazsa bunu deneyin
+
+## GO 
 ```
 rm -rf $HOME/go
 sudo rm -rf /usr/local/go
