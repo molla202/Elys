@@ -1,5 +1,5 @@
-## v0.4.0 güncelleme
-# go tekrar kuruyoruz
+## v0.4.0 Güncelleme
+# Go Tekrar Kuruyoruz
 ```
 # go tekrar kuruyoruz
 rm -rf $HOME/go
@@ -15,7 +15,7 @@ EOF
 source $HOME/.profile
 go version 
 ```
-# go tekrar kuruyoruz
+# Güncellememizi Yapıyoruz
 ```
 cd $HOME
 rm -rf elys
