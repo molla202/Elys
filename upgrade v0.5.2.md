@@ -1,4 +1,4 @@
-
+# 476500 block wait
 ## v0.5.2 Güncelleme
 # Go Tekrar Kuruyoruz
 ```
