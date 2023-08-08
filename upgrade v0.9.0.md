@@ -1,6 +1,7 @@
 ## Blok yükseliği 2041000 geldiğinde yapacağız.
 
 ```
+systemctl stop elysd
 cd $HOME/elys
 git fetch --all
 git checkout v0.9.0
