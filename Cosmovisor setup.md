@@ -108,10 +108,10 @@ Type=simple
 Restart=on-failure 
 RestartSec=5 
 User=elys 
-ExecStart=/home/elys/go/bin/cosmovisor run start
+ExecStart=$HOME/.elys/cosmovisor/genesis/bin/ run start
 LimitNOFILE=65535
 Environment="DAEMON_NAME=elysd"
-Environment="DAEMON_HOME=/home/elys/.elys"
+Environment="DAEMON_HOME=$HOME/.elys"
 Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
 Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
 Environment="UNSAFE_SKIP_BACKUP=true"
