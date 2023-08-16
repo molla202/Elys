@@ -42,6 +42,8 @@ echo "export ELYS_CHAIN_ID="elystestnet-1"" >> $HOME/.bash_profile
 echo "export ELYS_PORT="38"" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 
+go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@latest
+
 # binary indiriyoruz
 cd $HOME
 rm -rf elys
@@ -59,12 +61,6 @@ elysd init validator-adınız --chain-id elystestnet-1
 # genesis ve addrbook indiriyoruz
 wget -O $HOME/.elys/config/genesis.json https://testnet-files.itrocket.net/elys/genesis.json
 wget -O $HOME/.elys/config/addrbook.json https://testnet-files.itrocket.net/elys/addrbook.json
-
-go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@latest
-
-mkdir -p ~/.elys/cosmovisor/genesis/bin $ mkdir -p ~/.elys/cosmovisor/upgrades
-
-cp ~/go/bin/elysd ~/.elys/cosmovisor/genesis/bin/
 
 # seeds ve peers indiriyoruz
 SEEDS="ae7191b2b922c6a59456588c3a262df518b0d130@elys-testnet-seed.itrocket.net:38656"
@@ -96,6 +92,10 @@ sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"50\"/" $HOME/.elys/conf
 sed -i 's/minimum-gas-prices =.*/minimum-gas-prices = "0.0uelys"/g' $HOME/.elys/config/app.toml
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.elys/config/config.toml
 sed -i -e "s/^indexer *=.*/indexer = \"null\"/" $HOME/.elys/config/config.toml
+
+mkdir -p ~/.elys/cosmovisor/genesis/bin $ mkdir -p ~/.elys/cosmovisor/upgrades
+
+cp ~/go/bin/elysd ~/.elys/cosmovisor/genesis/bin/
 
 # servis dosyası oluşturuyore
 sudo tee /etc/systemd/system/elysd.service > /dev/null <<EOF
