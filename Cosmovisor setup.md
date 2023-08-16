@@ -49,7 +49,7 @@ cd $HOME
 rm -rf elys
 git clone https://github.com/elys-network/elys.git
 cd elys
-git checkout v0.3.1
+git checkout v0.9.0
 make install
 
 # ayarlamaları yapalım
