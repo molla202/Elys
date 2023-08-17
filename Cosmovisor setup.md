@@ -108,7 +108,7 @@ Type=simple
 Restart=on-failure 
 RestartSec=5 
 User=elys 
-ExecStart=$HOME/.elys/cosmovisor/genesis/bin/ run start
+ExecStart=$(which cosmovisor) run start
 LimitNOFILE=65535
 Environment="DAEMON_NAME=elysd"
 Environment="DAEMON_HOME=$HOME/.elys"
