@@ -121,8 +121,19 @@ WantedBy=multi-user.target
 ```
 ```
 # snap çakalım hemen olsun
-elysd tendermint unsafe-reset-all --home $HOME/.elys
-curl https://testnet-files.itrocket.net/elys/snap_elys.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.elys
+sudo apt install liblz4-tool
+
+sudo systemctl stop elysd
+
+cp $HOME/.elys/data/priv_validator_state.json $HOME/.elys/priv_validator_state.json.backup
+
+elysd tendermint unsafe-reset-all
+
+curl -L http://202.61.243.24/CoreNode_ChainServices/elys_snapshot.tar.lz4 | tar -I lz4 -xf - -C $HOME/.elys/data
+
+mv $HOME/.elys/priv_validator_state.json.backup $HOME/.elys/data/priv_validator_state.json
+
+sudo systemctl start elysd && sudo journalctl -u elysd -fo cat
 ```
 ```
 # servisi başlatıp loglara bakıyoruz
