@@ -1,4 +1,4 @@
-## Blok yükseliği 2041000 geldiğinde yapacağız.
+## Blok yükseliği  2645000 geldiğinde yapacağız.
 
 ## GO kurmamız gerekiyor atlamayın
 ```
