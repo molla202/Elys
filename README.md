@@ -6,6 +6,15 @@
 # Elys
 ![1500x500](https://user-images.githubusercontent.com/91562185/231207195-fff4a84b-36d3-4af5-85dd-1b9675417730.jpg)
 
+
+
+### Ödülleri talep etme şekli değişti
+```
+elysd tx incentive withdraw-rewards --from mykey
+```
+```
+elysd tx incentive withdraw-rewards --from mykey --commission --validator-address <address>
+```
 ## Güncelleme ve kütüphane kurulumunu yapıyoruz.
 ```
 sudo apt update && sudo apt upgrade -y && sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential bsdmainutils git make ncdu gcc git jq chrony liblz4-tool -y
