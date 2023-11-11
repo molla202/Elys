@@ -1,4 +1,4 @@
-Upgrade height: 
+Upgrade height: 3755000
 
 ### Manuel upgrade
 ```
